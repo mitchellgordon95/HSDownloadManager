@@ -33,13 +33,17 @@ namespace HSDownloadManager
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		void Add_Button_Click(object sender, RoutedEventArgs e) {
-			grid.RowDefinitions.Add(new RowDefinition());
-			TextBlock txt1 = new TextBlock();
-			txt1.Text = "test";
-			Grid.SetRow(txt1, grid.RowDefinitions.Count - 1);
-			grid.Children.Add(txt1);
+
 		}
 
+		/// <summary>
+		/// Called when the "Settings" button is clicked.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void Settings_Button_Click(object sender, RoutedEventArgs e)
+		{
+		}
 	}
 
 }

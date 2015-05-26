@@ -2,24 +2,29 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
-	<Grid x:Name="grid" ShowGridLines="True">
+	<Grid x:Name="grid">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="121*"/>
 			<ColumnDefinition Width="117*"/>
-			<ColumnDefinition Width="137*"/>
-			<ColumnDefinition Width="36*"/>
-			<ColumnDefinition Width="106*"/>
+			<ColumnDefinition Width="50*"/>
+			<ColumnDefinition Width="80*"/>
+			<ColumnDefinition Width="40*"/>
+			<ColumnDefinition Width="40*"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="41"/>
-			<RowDefinition Height="29"/>
+			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 		<TextBlock Grid.Column="0" Grid.ColumnSpan="5" FontSize="22" Grid.RowSpan="3">Horrible Subs Download Manager</TextBlock>
-		<Button Click="Add_Button_Click" Grid.Column="3" Grid.ColumnSpan="2" >Add Show</Button>
-		<TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="Name" FontWeight="Bold"/>
-		<TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="Next Episode" FontWeight="Bold"/> 
-		<TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2" Text="Air Date" FontWeight="Bold"/> 
-		<TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="3" Text="Edit" FontWeight="Bold"/>
-		<TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="4" Text="Delete" FontWeight="Bold"/>
+		<Button Click="Settings_Button_Click" Grid.Column="3" >Settings</Button>
+		<Button Click="Add_Button_Click" Grid.Column="4" Grid.ColumnSpan="2" >Add Show</Button>
+		<ListView x:Name="Shows_LV" Grid.Row="1" Grid.ColumnSpan="6">
+			<GridView>
+				<GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}"/>
+				<GridViewColumn Header="Next Episode" Width="120" DisplayMemberBinding="{Binding NextEpisode}"/>
+				<GridViewColumn Header="Air Date" Width="120" DisplayMemberBinding="{Binding AirDate}"/>
+				<GridViewColumn Header="Status" Width="80" DisplayMemberBinding="{Binding Status}"/>
+			</GridView>
+		</ListView>
 	</Grid>
 </Window>

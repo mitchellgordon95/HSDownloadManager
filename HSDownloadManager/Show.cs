@@ -10,5 +10,7 @@ namespace HSDownloadManager
 	{
 		public string Name {get; set;}
 		public int NextEpisode {get; set;}
+		public string AirDate { get; set; }
+		public string Status { get; set; }
 	}
 }
