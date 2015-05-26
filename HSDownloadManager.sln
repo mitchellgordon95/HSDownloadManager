@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSDownloadManager", "HSDownloadManager\HSDownloadManager.csproj", "{EBE5A9D4-0BE4-4BDB-ABCC-DD29A2FD795F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBE5A9D4-0BE4-4BDB-ABCC-DD29A2FD795F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBE5A9D4-0BE4-4BDB-ABCC-DD29A2FD795F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBE5A9D4-0BE4-4BDB-ABCC-DD29A2FD795F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBE5A9D4-0BE4-4BDB-ABCC-DD29A2FD795F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
