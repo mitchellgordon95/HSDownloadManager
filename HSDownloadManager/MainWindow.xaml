@@ -17,14 +17,16 @@
 		</Grid.RowDefinitions>
 		<TextBlock Grid.Column="0" Grid.ColumnSpan="5" FontSize="22" Grid.RowSpan="3">Horrible Subs Download Manager</TextBlock>
 		<Button Click="Settings_Button_Click" Grid.Column="3" >Settings</Button>
-		<Button Click="Add_Button_Click" Grid.Column="4" Grid.ColumnSpan="2" >Add Show</Button>
+		<Button Click="Download_Button_Click" Grid.Column="4" Grid.ColumnSpan="2" >Download</Button>
 		<ListView x:Name="Shows_LV" Grid.Row="1" Grid.ColumnSpan="6">
-			<GridView>
-				<GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}"/>
-				<GridViewColumn Header="Next Episode" Width="120" DisplayMemberBinding="{Binding NextEpisode}"/>
-				<GridViewColumn Header="Air Date" Width="120" DisplayMemberBinding="{Binding AirDate}"/>
-				<GridViewColumn Header="Status" Width="80" DisplayMemberBinding="{Binding Status}"/>
-			</GridView>
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}"/>
+					<GridViewColumn Header="Next Episode" Width="120" DisplayMemberBinding="{Binding NextEpisode}"/>
+					<GridViewColumn Header="Air Date" Width="120" DisplayMemberBinding="{Binding AirDate}"/>
+					<GridViewColumn Header="Status" Width="80" DisplayMemberBinding="{Binding Status}"/>
+				</GridView>
+			</ListView.View>
 		</ListView>
 	</Grid>
 </Window>

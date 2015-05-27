@@ -20,11 +20,15 @@ namespace HSDownloadManager
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		List<Show> ShowCollection = new List<Show>();
 
 		public MainWindow()
 		{
 			InitializeComponent();
+			Shows_LV.Items.Clear();
+			Shows_LV.ItemsSource = ShowCollection;
 
+			ShowCollection.Add(new Show { Name = "test", Status = "Waiting", AirDate = "Mon", NextEpisode = 1 });
 		}
 
 		/// <summary>
@@ -32,7 +36,7 @@ namespace HSDownloadManager
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		void Add_Button_Click(object sender, RoutedEventArgs e) {
+		void Download_Button_Click(object sender, RoutedEventArgs e) {
 
 		}
 
