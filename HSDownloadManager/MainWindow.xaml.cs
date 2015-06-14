@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using IrcDotNet;
 using System.Threading;
 using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace HSDownloadManager
 {
@@ -28,20 +30,20 @@ namespace HSDownloadManager
 		ObservableCollection<Show> ShowCollection = new ObservableCollection<Show>();
         List<Pack> PacksToDownload = new List<Pack>();
 
-        // A semaphore for waiting until the next step is ready.
-        EventWaitHandle nextStep = new EventWaitHandle(false, EventResetMode.AutoReset);
+        // The Show we're currently downloading
+        Show nextShow;
 
-        // The next pack we're going to download
-        Pack nextPack = new Pack();
+        // Whether we've already started downloading packs
+        bool downloading;
 
         IrcDotNet.StandardIrcClient client;
         IrcDotNet.Ctcp.CtcpClient ctcp;
         string server = "irc://irc.rizon.net";
         string channel = "#horriblesubs";
-        string nick = "SomeOtherNick";
+        string nick = "SomeTotallyInconspicuousNick";
         string pass = "";
         string resolution = "720";
-        string targetBot = "HelloKitty";
+        string targetBot = "hellokitty";
         string downloadsFolder = @"C:\Users\Megaflux\Documents\Downloads";
 
         public MainWindow()
@@ -92,37 +94,52 @@ namespace HSDownloadManager
 		void Download_Button_Click(object sender, RoutedEventArgs e) {
 
             if (!client.IsConnected)
-                MessageBox.Show("Error: Server not connected.");
-
-            // Join the channel and set the listener for incoming pack numbers
-            client.Channels.Join(channel);
-            client.LocalUser.NoticeReceived += AcceptPackNumber;
-
-            // Ask the channel for the pack numbers 
-            foreach (Show s in ShowCollection)
             {
-                if (s.Status == "Available")
-                {
-                    s.Status = "Searching";
-
-                    // Ask the channel for the pack number of the episode we're looking for.
-                    nextPack.Show = s;                   
-                    RequestPackNumber(s);
-
-                    // Wait until we get a pack number
-                    nextStep.WaitOne();
-
-                    s.Status = "Downloading";
-
-                    // Ask the bot to download the pack
-                    RequestDownloadPack(nextPack);
-
-                    // Wait until the download is finished before we start the next one.
-                    nextStep.WaitOne();
-
-                    s.Status = "Downloaded";
-                }
+                MessageBox.Show("Error: Server not connected.");
+                return;
             }
+            if (downloading)
+            {
+                MessageBox.Show("Already in the process of downloading.");
+                return;
+            }
+
+            downloading = true;
+
+            // Do the downloading in a background thread so we don't block the UI.
+            Task t = Task.Factory.StartNew(() =>
+            {
+               // Join the channel and set the listener for incoming pack numbers
+               client.Channels.Join(channel);
+               client.LocalUser.NoticeReceived += AcceptPackNumber;
+
+               // Ask the channel for the pack numbers 
+               foreach (Show s in ShowCollection)
+               {
+                   if (s.Status == "Available")
+                   {
+                       s.Status = "Searching";
+
+                       // Ask the channel for the pack number of the episode we're looking for.
+                       nextShow = s;                     
+                       RequestPackNumber(s);
+
+                        // Wait for the show to finish downloading before starting the next one.
+                        lock (nextShow)
+                        {
+                            Monitor.Wait(nextShow);
+                        }
+
+                        s.Status = "Downloaded";
+                        s.NextEpisode++;
+                        s.AirsOn.AddDays(7);
+                   }
+               }
+
+                downloading = false;
+           });
+
+            
 		}
 
         /// <summary>
@@ -143,7 +160,8 @@ namespace HSDownloadManager
         /// <param name="e"></param>
         private void AcceptPackNumber(object sender, IrcMessageEventArgs e)
         {
-            Show s = nextPack.Show;
+            Pack nextPack = new Pack();
+            Show s = nextPack.Show = nextShow;
 
             string text = e.Text.ToLower();
 
@@ -159,17 +177,18 @@ namespace HSDownloadManager
 
                 nextPack.Number = text.Substring(packStart + 1, packEnd - packStart);
 
-                nextPack.Target = e.Source.Name;
+                nextPack.Target = targetBot;
 
-                nextStep.Set();
+                RequestDownloadPack(nextPack);
             }
         }
 
         private void RequestDownloadPack(Pack p)
         {
+            p.Show.Status = "Downloading";
+
             Console.WriteLine("Requesting pack #" + p.Number + " from " + p.Target);
 
-            // This is probably more complicated
             client.LocalUser.SendMessage(p.Target, "xdcc send " + p.Number);
         }
 
@@ -187,11 +206,12 @@ namespace HSDownloadManager
 
                 UInt32 ipInt = UInt32.Parse(parts[0]);
                 int port = int.Parse(parts[1]);
-                string filename = msg.Substring(6, spaceAfterFilename - 6);
+                int fileSize = int.Parse(parts[2]);
+                string filename = msg.Substring(5, spaceAfterFilename - 5);
 
                 // Strip quotes from the file name
                 if (filename.ElementAt(0) == '"')
-                    filename = filename.Substring(1, filename.Length - 1);
+                    filename = filename.Substring(1, filename.Length - 2);
 
                 // Convert the ip address integer to an actual ip address.
                 byte[] bytes = BitConverter.GetBytes(ipInt);
@@ -204,7 +224,37 @@ namespace HSDownloadManager
 
                 Console.WriteLine("Received DCC SEND request for file " + filename + " at " + ipAdd.ToString() + ":" + port);
 
-                // TODO: Actually download the file from the given address.
+                // Open a file for writing
+                FileStream file = System.IO.File.Open(downloadsFolder + @"\" + filename, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.);
+
+                // Connect to the XDCC server on the specified ip and port
+                IPEndPoint endPt = new IPEndPoint(ipAdd, port);
+                Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                sock.Connect(endPt);
+
+                // Read the data into the file
+                byte[] buffer = new byte[1024];
+                int bytesRead, totalBytesRead = 0;
+                while ( (bytesRead = sock.Receive(buffer)) > 0 && totalBytesRead < fileSize)
+                {
+                    file.Write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+
+                    // Flush the file stream every ~5 MB
+                    if (totalBytesRead > 0 && totalBytesRead % 5000 == 0)
+                        file.Flush();
+
+                    nextShow.Status = "Downloading (" + totalBytesRead / (1024 * 1024) + " MB)";
+                }
+
+                file.Close();
+
+                // Signal the main loop that the show has finished downloading.
+                lock (nextShow)
+                {
+                    Monitor.Pulse(nextShow);
+                }
+
             }
         }
 
