@@ -1,0 +1,41 @@
+﻿<Window x:Class="HSDownloadManager.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HSDownloadManager"
+        xmlns:properties="clr-namespace:HSDownloadManager.Properties"
+        mc:Ignorable="d"
+        Title="Settings" Height="300" Width="300">
+    <Grid DataContext="{Binding Source={x:Static properties:Settings.Default}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0">Server URL</TextBlock>
+        <TextBox Name="ServerTB" Grid.Column="1" Grid.Row="0" Text="{Binding Server}"/>
+        <TextBlock Grid.Column="0" Grid.Row="1">Channel</TextBlock>
+        <TextBox Name="ChannelTB" Grid.Column="1" Grid.Row="1" Text="{Binding Channel}"/>
+        <TextBlock Grid.Column="0" Grid.Row="2">Nick</TextBlock>
+        <TextBox Name="NickTB" Grid.Column="1" Grid.Row="2" Text="{Binding Nick}"/>
+        <TextBlock Grid.Column="0" Grid.Row="3">Pass</TextBlock>
+        <TextBox Name="PassTB" Grid.Column="1" Grid.Row="3" Text="{Binding Pass}"/>
+        <TextBlock Grid.Column="0" Grid.Row="4">Resolution</TextBlock>
+        <TextBox Name="ResolutionTB" Grid.Column="1" Grid.Row="4" Text="{Binding Resolution}"/>
+        <TextBlock Grid.Column="0" Grid.Row="5">Target Bot</TextBlock>
+        <TextBox Name="TargetBotTB" Grid.Column="1" Grid.Row="5" Text="{Binding TargetBot}"/>
+        <TextBlock Grid.Column="0" Grid.Row="6">Downloads Folder</TextBlock>
+        <TextBox Name="DownloadsFolderTB" Grid.Column="1" Grid.Row="6" Text="{Binding DownloadsFolder}"/>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="7">Save</Button>
+    </Grid>
+</Window>

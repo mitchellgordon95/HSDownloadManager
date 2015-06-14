@@ -40,7 +40,7 @@ namespace HSDownloadManager
         IrcDotNet.StandardIrcClient client;
         IrcDotNet.Ctcp.CtcpClient ctcp;
 
-        Settings settings = Properties.Settings.Default;
+        Settings settings = Settings.Default;
 
         public MainWindow()
         {
@@ -338,6 +338,7 @@ namespace HSDownloadManager
 		/// <param name="e"></param>
 		void Settings_Button_Click(object sender, RoutedEventArgs e)
 		{
+            new SettingsWindow().Show();
 		}
 	}
 
