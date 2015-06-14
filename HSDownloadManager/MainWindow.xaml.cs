@@ -225,7 +225,7 @@ namespace HSDownloadManager
                 Console.WriteLine("Received DCC SEND request for file " + filename + " at " + ipAdd.ToString() + ":" + port);
 
                 // Open a file for writing
-                FileStream file = System.IO.File.Open(downloadsFolder + @"\" + filename, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.);
+                FileStream file = System.IO.File.Open(downloadsFolder + @"\" + filename, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
 
                 // Connect to the XDCC server on the specified ip and port
                 IPEndPoint endPt = new IPEndPoint(ipAdd, port);
