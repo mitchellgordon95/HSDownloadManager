@@ -9,6 +9,12 @@ namespace HSDownloadManager
 {
 	class Show : INotifyPropertyChanged
 	{
+
+        public Show()
+        {
+            Error = false;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void SetMember<T>(ref T mem, T val, string propName)
@@ -47,6 +53,8 @@ namespace HSDownloadManager
             set { SetMember(ref _status, value, "Status"); }
         }
         private string _status;
+
+        public bool Error { get; set; }
 
     }
 }
