@@ -24,6 +24,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Column="0" Grid.Row="0">Server URL</TextBlock>
         <TextBox Name="ServerTB" Grid.Column="1" Grid.Row="0" Text="{Binding Server}"/>
@@ -45,6 +46,8 @@
         <CheckBox Name="RunOnWindowsStartupCB" Grid.Column="1" Grid.Row="8" IsChecked="{Binding RunOnWindowsStartup}"></CheckBox>
         <TextBlock Grid.Column="0" Grid.Row="9">Download on Startup?</TextBlock>
         <CheckBox Name="DownloadOnStartupCB" Grid.Column="1" Grid.Row="9" IsChecked="{Binding DownloadOnStartup}"></CheckBox>
-        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="10">Save</Button>
+        <Button Click="Import_Shows_Click" Grid.Column="0" Grid.Row="10">Import Shows</Button>
+        <Button Click="Export_Shows_Click" Grid.Column="1" Grid.Row="10">Export Shows</Button>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="11">Save</Button>
     </Grid>
 </Window>

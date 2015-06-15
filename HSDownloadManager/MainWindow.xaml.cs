@@ -20,6 +20,7 @@ using System.Net.Sockets;
 using System.IO;
 using HSDownloadManager.Properties;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace HSDownloadManager
 {
@@ -51,7 +52,7 @@ namespace HSDownloadManager
             InitializeComponent();
 
             try {
-                ShowCollection.LoadFromFile(@".\shows");
+                ShowCollection.LoadFromFile(Directory.GetCurrentDirectory() + @"\shows");
             }
             catch (Exception e)
             {
@@ -95,7 +96,7 @@ namespace HSDownloadManager
         // Save the show information to the file when the user closes the window.
         protected override void OnClosing(CancelEventArgs e)
         {
-            ShowCollection.SaveToFile(@".\shows");
+            ShowCollection.SaveToFile(Directory.GetCurrentDirectory() + @"\shows");
         }
 
        
@@ -359,7 +360,9 @@ namespace HSDownloadManager
 		/// <param name="e"></param>
 		void Settings_Button_Click(object sender, RoutedEventArgs e)
 		{
-            new SettingsWindow().Show();
+            SettingsWindow win = new SettingsWindow();
+            win.Owner = this;
+            win.Show();
 		}
 
         /// <summary>

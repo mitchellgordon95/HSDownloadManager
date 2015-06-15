@@ -1,4 +1,5 @@
 ﻿using HSDownloadManager.Properties;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,42 @@ namespace HSDownloadManager
             {
                 MessageBox.Show("One of your settings is malformed. Please try again.");
             }
+        }
+
+        private void Import_Shows_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog diag = new OpenFileDialog();
+            diag.FileOk += (sender2, args) => {
+
+                try {
+                    (Owner as MainWindow).ShowCollection.LoadFromFile(diag.FileName);
+                    MessageBox.Show("Loaded shows from " + diag.FileName);
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show("Unable to parse file.");
+                }
+            };
+            diag.ShowDialog(this);
+        }
+
+        private void Export_Shows_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog diag = new SaveFileDialog();
+            diag.FileOk += (sender2, args) =>
+            {
+
+                try
+                {
+                    (Owner as MainWindow).ShowCollection.SaveToFile(diag.FileName);
+                    MessageBox.Show("Saved shows to " + diag.FileName);
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show("Unable to save file.");
+                }
+            };
+            diag.ShowDialog(this);
         }
     }
 }
