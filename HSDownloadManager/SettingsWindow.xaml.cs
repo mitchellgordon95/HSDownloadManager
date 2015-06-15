@@ -27,18 +27,32 @@ namespace HSDownloadManager
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
         {
-            Settings set = Properties.Settings.Default;
-            set.Server = ServerTB.Text;
-            set.Channel = ChannelTB.Text;
-            set.Nick = NickTB.Text;
-            set.Pass = PassTB.Text;
-            set.Resolution = ResolutionTB.Text;
-            set.TargetBot = TargetBotTB.Text;
-            set.DownloadsFolder = DownloadsFolderTB.Text;
-            set.SearchTimeout = int.Parse(TimeoutTB.Text);
+            try {
+                Settings set = Properties.Settings.Default;
+                set.Server = ServerTB.Text;
+                set.Channel = ChannelTB.Text;
+                set.Nick = NickTB.Text;
+                set.Pass = PassTB.Text;
+                set.Resolution = ResolutionTB.Text;
+                set.TargetBot = TargetBotTB.Text;
+                set.DownloadsFolder = DownloadsFolderTB.Text;
+                set.SearchTimeout = int.Parse(TimeoutTB.Text);
+                set.RunOnWindowsStartup = RunOnWindowsStartupCB.IsChecked.Value;
+                set.DownloadOnStartup = DownloadOnStartupCB.IsChecked.Value;
 
-            set.Save();
-            this.Close();
+                set.Save();
+
+                if (set.RunOnWindowsStartup)
+                    StartUpManager.AddApplicationToCurrentUserStartup();
+                else
+                    StartUpManager.RemoveApplicationFromCurrentUserStartup();
+
+                this.Close();
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show("One of your settings is malformed. Please try again.");
+            }
         }
     }
 }

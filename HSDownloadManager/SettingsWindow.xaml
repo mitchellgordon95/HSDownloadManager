@@ -22,6 +22,8 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Column="0" Grid.Row="0">Server URL</TextBlock>
         <TextBox Name="ServerTB" Grid.Column="1" Grid.Row="0" Text="{Binding Server}"/>
@@ -38,7 +40,11 @@
         <TextBlock Grid.Column="0" Grid.Row="6">Downloads Folder</TextBlock>
         <TextBox Name="DownloadsFolderTB" Grid.Column="1" Grid.Row="6" Text="{Binding DownloadsFolder}"/>
         <TextBlock Grid.Column="0" Grid.Row="7">Search Timeout (s)</TextBlock>
-        <TextBox Name="TimeoutTB" Grid.Column="1" Grid.Row="7" Text="{Binding WaitTime}"/>
-        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="8">Save</Button>
+        <TextBox Name="TimeoutTB" Grid.Column="1" Grid.Row="7" Text="{Binding SearchTimeout}"/>
+        <TextBlock Grid.Column="0" Grid.Row="8">Run On Windows Startup?</TextBlock>
+        <CheckBox Name="RunOnWindowsStartupCB" Grid.Column="1" Grid.Row="8" IsChecked="{Binding RunOnWindowsStartup}"></CheckBox>
+        <TextBlock Grid.Column="0" Grid.Row="9">Download on Startup?</TextBlock>
+        <CheckBox Name="DownloadOnStartupCB" Grid.Column="1" Grid.Row="9" IsChecked="{Binding DownloadOnStartup}"></CheckBox>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="10">Save</Button>
     </Grid>
 </Window>

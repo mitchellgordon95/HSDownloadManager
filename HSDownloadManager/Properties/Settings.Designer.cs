@@ -118,5 +118,29 @@ namespace HSDownloadManager.Properties {
                 this["SearchTimeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RunOnWindowsStartup {
+            get {
+                return ((bool)(this["RunOnWindowsStartup"]));
+            }
+            set {
+                this["RunOnWindowsStartup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DownloadOnStartup {
+            get {
+                return ((bool)(this["DownloadOnStartup"]));
+            }
+            set {
+                this["DownloadOnStartup"] = value;
+            }
+        }
     }
 }

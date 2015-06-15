@@ -86,6 +86,10 @@ namespace HSDownloadManager
             client.ConnectFailed += (sender, args) => { MessageBox.Show("Connection failed. Check the server setting and your internet connection."); };
             client.Error += (sender, args) => { MessageBox.Show("Generic error thrown: " + args.Error.Message); };
 
+            // If the "Download On Startup" option is selected, go ahead and do it.
+            if (settings.DownloadOnStartup)
+                Download_Button_Click(null, null);
+
 		}
 
         // Save the show information to the file when the user closes the window.
@@ -102,7 +106,7 @@ namespace HSDownloadManager
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		void Download_Button_Click(object sender, RoutedEventArgs e)
-        { 
+        {
             if (downloading)
             {
                 MessageBox.Show("Already in the process of downloading.");
