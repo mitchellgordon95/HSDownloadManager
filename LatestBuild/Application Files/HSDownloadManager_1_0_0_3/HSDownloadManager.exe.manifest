@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="HSDownloadManager.exe" version="1.0.0.3" publicKeyToken="181ee2281927231b" language="neutral" processorArchitecture="msil" type="win32" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="HSDownloadManager" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+    <commandLine file="HSDownloadManager.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC Manifest Options
+          If you want to change the Windows User Account Control level replace the 
+          requestedExecutionLevel node with one of the following.
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         If you want to utilize File and Registry Virtualization for backward 
+         compatibility then delete the requestedExecutionLevel node.
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="HSDownloadManager.exe" size="32752">
+      <assemblyIdentity name="HSDownloadManager" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>m/Tcp354SXX42t6aOQH+NawbCDSRyZBYue1KtALk70A=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="IrcDotNet.dll" size="126976">
+      <assemblyIdentity name="IrcDotNet" version="0.5.0.0" publicKeyToken="44F6D157E750246B" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>Vsr1Ls5xn52BY3+ARzHIteNsnVtwCXf+9HkAP8jIMoM=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="HSDownloadManager.exe.config" size="2120">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>6R9GekRMJ4mXK53ztsfIatQ++yCGRtna0C1Zv4CGrME=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=Megaflux-THINK\Megaflux" issuerKeyHash="ed1a8fa15b57671e3f3c02b4a508c26a5097c2b0" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>i5c5z56N/5yScodHI5rMX880hurwDQ3XdyUHBt/LDOo=</DigestValue></Reference></SignedInfo><SignatureValue>w2/kScILlcoS52VFb2M9Zb9JplHHDbtY3EhJFzOiC65umDsmGIi3MHKmVQvzyuj4xgr9PD4g2kNpUQxFI4e/Ae3ABq19KkLcU0MQ9n1hKepVOpsfwqSt3NiONZk/rkPLqMVM4l6dhwHB9Q/ZxvrWRQUM+/7RT79vMCSMb0rpKAE=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>yxT68IuEh5veaqDOlPYvLylj6q2lF1EBmdAWT7lQRWjeWIUdMV/PK781uiiNQB2kw+1OrsRjgUx+8cz+e77wytSBODyAcrk9pNoDO2mlCSmf1a/EfnUKWRaEnN0r4md14QceIEAFhsYTp6wg6Fa6ThNTUwZwQJTA3vUDQ22a4M0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="ea0ccbdf06072577d70d0df0ea8634cf5fcc9a23478772929cff8d9ecf39978b" Description="" Url=""><as:assemblyIdentity name="HSDownloadManager.exe" version="1.0.0.3" publicKeyToken="181ee2281927231b" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=Megaflux-THINK\Megaflux</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>eVo5LPWZg462FGvIbuDSrsiXFaqziW2NENkvcIR+ahE=</DigestValue></Reference></SignedInfo><SignatureValue>fmk9SQ/pyTL+x6/jgI/mFZ5DVMFzIjBjSuN2OgkW16jvnqELZY1i5Zm7RFkjvHbOLr5Wy0a3eowtfXvALBGtb2+RvKRlcnBLt5eilBaCK6vZouy1iTHjrUxO4ZWXz5m1e23h0XCElgq3Hw9XdyUqNd5wMAU1Dp0n82QJvHWVmsk=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>yxT68IuEh5veaqDOlPYvLylj6q2lF1EBmdAWT7lQRWjeWIUdMV/PK781uiiNQB2kw+1OrsRjgUx+8cz+e77wytSBODyAcrk9pNoDO2mlCSmf1a/EfnUKWRaEnN0r4md14QceIEAFhsYTp6wg6Fa6ThNTUwZwQJTA3vUDQ22a4M0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB9TCCAV6gAwIBAgIQINoJvhpfNqJIUm4JvcIe5zANBgkqhkiG9w0BAQsFADA5MTcwNQYDVQQDHi4ATQBlAGcAYQBmAGwAdQB4AC0AVABIAEkATgBLAFwATQBlAGcAYQBmAGwAdQB4MB4XDTE1MDYxNTAzNTM0NVoXDTE2MDYxNDA5NTM0NVowOTE3MDUGA1UEAx4uAE0AZQBnAGEAZgBsAHUAeAAtAFQASABJAE4ASwBcAE0AZQBnAGEAZgBsAHUAeDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAyxT68IuEh5veaqDOlPYvLylj6q2lF1EBmdAWT7lQRWjeWIUdMV/PK781uiiNQB2kw+1OrsRjgUx+8cz+e77wytSBODyAcrk9pNoDO2mlCSmf1a/EfnUKWRaEnN0r4md14QceIEAFhsYTp6wg6Fa6ThNTUwZwQJTA3vUDQ22a4M0CAwEAATANBgkqhkiG9w0BAQsFAAOBgQCBrT3Pq8+WKpr5BnxKRmnV7yBcCfBjwofWFiYZw/wUgTFd4cKj8UJEEn7cPe+RLOn1EHX+5krOwJEscH+YTKRMojK9xcM425oILTNcGanaAiXBlncri10ckJ059Zv94wX+/2WssyvoT1tyNCqfNaZ6Qxqc49QT28cnze26dvkbDA==</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
