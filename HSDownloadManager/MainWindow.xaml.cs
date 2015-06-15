@@ -38,6 +38,9 @@ namespace HSDownloadManager
         // Whether we've already started downloading packs
         bool downloading;
 
+        // Have we failed downloading the current show?
+        bool downloadError = false;
+
         IrcDotNet.StandardIrcClient client;
         IrcDotNet.Ctcp.CtcpClient ctcp;
 
@@ -63,7 +66,11 @@ namespace HSDownloadManager
             Shows_LV.SelectionChanged += (sender, args) =>
             {
                 if (args.AddedItems.Count > 0)
-                    new EditShowWindow(args.AddedItems[0] as Show).Show();
+                {
+                    EditShowWindow win = new EditShowWindow(args.AddedItems[0] as Show);
+                    win.Owner = this;
+                    win.Show();
+                }
             };
 
             // Update the status of the shows if they've become available.
@@ -81,23 +88,13 @@ namespace HSDownloadManager
 
 		}
 
+        // Save the show information to the file when the user closes the window.
         protected override void OnClosing(CancelEventArgs e)
         {
             ShowCollection.SaveToFile(@".\shows");
         }
 
-        /// <summary>
-        /// Checks if the show has become available and sets its status appropriately.
-        /// </summary>
-        /// <param name="s"></param>
-        void UpdateShowStatus (Show s)
-        {
-            if (s.AirsOn < DateTime.Now)
-                s.Status = "Available";
-            else
-                s.Status = "Unavailable";
-
-        }
+       
 
 		/// <summary>
 		/// Called when the "Download" button is clicked.
@@ -115,10 +112,6 @@ namespace HSDownloadManager
             // Refresh show statuses in case we had an error last time.
             foreach (Show s in ShowCollection)
                 UpdateShowStatus(s);
-
-            // Set the listener for incoming downloads
-            ctcp.RawMessageReceived -= AcceptDownloadRequest;
-            ctcp.RawMessageReceived += AcceptDownloadRequest;
 
             // If we're already connected, go ahead and start searching for packs
             if (client.IsConnected)
@@ -149,15 +142,14 @@ namespace HSDownloadManager
         {
             downloading = true;
 
-            // Join the channel and set the listener for incoming pack numbers
+            // Join the channel
             client.Channels.Join(settings.Channel);
-            client.LocalUser.NoticeReceived += AcceptPackNumber;
 
-            // Ask the channel for the pack numbers 
             foreach (Show s in ShowCollection)
             {
                 if (s.Status == "Available")
                 {
+                    downloadError = false;
                     s.Status = "Searching";
 
                     // Ask the channel for the pack number of the episode we're looking for.
@@ -168,7 +160,7 @@ namespace HSDownloadManager
                     lock (nextShow)
                     {
                         Monitor.Wait(nextShow);
-                        if (nextShow.Error)
+                        if (downloadError)
                         {
                             nextShow.Status = "Error";
                         }
@@ -193,22 +185,22 @@ namespace HSDownloadManager
         void RequestPackNumber(Show s)
         {
             string episodeNumber = (s.NextEpisode > 9) ? s.NextEpisode.ToString() : "0" + s.NextEpisode.ToString();
-
+            client.LocalUser.NoticeReceived += AcceptPackNumber;
             client.LocalUser.SendMessage(settings.Channel, "@find " + s.Name + " " + episodeNumber + " " + settings.Resolution);
 
             // If we don't find the pack number in less than 10 seconds, throw an error
             Task t = Task.Factory.StartNew(() =>
            {
-               Thread.Sleep(10000);
+               Thread.Sleep(settings.SearchTimeout * 1000);
                lock (nextShow)
                {
-                   if (nextShow.Status != "Downloading" || nextShow.Status != "Downloaded")
+                   if (!nextShow.Status.Contains("Download")) // Downloading or Downloaded
                    {
                        if (nextShow.Status == "Searching")
                            Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + nextShow.Name + " episode " + nextShow.NextEpisode));
                        if (nextShow.Status == "Requesting")
                            Task.Factory.StartNew(() => MessageBox.Show("Bot did not respond to XDCC SEND request for " + nextShow.Name + " episode " + nextShow.NextEpisode));
-                       nextShow.Error = true;
+                       downloadError = true;
                        Monitor.Pulse(nextShow);
                    }
                }
@@ -245,6 +237,8 @@ namespace HSDownloadManager
                     nextPack.Target = settings.TargetBot;
 
                     RequestDownloadPack(nextPack);
+
+                    client.LocalUser.NoticeReceived -= AcceptPackNumber;
                 }
             }
         }
@@ -258,6 +252,8 @@ namespace HSDownloadManager
             p.Show.Status = "Requesting";
 
             Console.WriteLine("Requesting pack #" + p.Number + " from " + p.Target);
+
+            ctcp.RawMessageReceived += AcceptDownloadRequest;
 
             client.LocalUser.SendMessage(p.Target, "xdcc send " + p.Number);
         }
@@ -275,6 +271,8 @@ namespace HSDownloadManager
             string msg = e.Message.Data;
             if (msg != null && msg.StartsWith("SEND"))
             {
+                ctcp.RawMessageReceived -= AcceptDownloadRequest;
+
                 lock (nextShow)
                 {
                     nextShow.Status = "Downloading";
@@ -309,7 +307,10 @@ namespace HSDownloadManager
 
                 try {
                     // Open a file for writing
-                    FileStream file = System.IO.File.Open(settings.DownloadsFolder + @"\" + filename, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+                    string fullFilename = settings.DownloadsFolder + @"\" + filename;
+                    while (File.Exists(fullFilename))
+                        fullFilename += ".1";
+                    FileStream file = System.IO.File.Open(fullFilename, System.IO.FileMode.CreateNew, FileAccess.Write, FileShare.Read);
 
                     // Connect to the XDCC server on the specified ip and port
                     IPEndPoint endPt = new IPEndPoint(ipAdd, port);
@@ -324,10 +325,6 @@ namespace HSDownloadManager
                         file.Write(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
 
-                        // Flush the file stream every ~5 MB
-                        if (totalBytesRead > 0 && totalBytesRead % 5000 == 0)
-                            file.Flush();
-
                         nextShow.Status = "Downloading (" + totalBytesRead / (1024 * 1024) + " MB)";
                     }
 
@@ -338,7 +335,7 @@ namespace HSDownloadManager
                     MessageBox.Show("Exception thrown: " + err.Message);
                     lock (nextShow)
                     {
-                        nextShow.Error = true;
+                        downloadError = true;
                     }
                 }
 
@@ -370,6 +367,18 @@ namespace HSDownloadManager
         {
             new EditShowWindow(null).Show();
         }
-	}
+
+        /// <summary>
+        /// Checks if the show has become available and sets its status appropriately.
+        /// </summary>
+        /// <param name="s"></param>
+        void UpdateShowStatus(Show s)
+        {
+            if (s.AirsOn < DateTime.Now)
+                s.Status = "Available";
+            else
+                s.Status = "Unavailable";
+        }
+    }
 
 }

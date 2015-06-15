@@ -35,6 +35,7 @@ namespace HSDownloadManager
             set.Resolution = ResolutionTB.Text;
             set.TargetBot = TargetBotTB.Text;
             set.DownloadsFolder = DownloadsFolderTB.Text;
+            set.SearchTimeout = int.Parse(TimeoutTB.Text);
 
             set.Save();
             this.Close();

@@ -106,5 +106,17 @@ namespace HSDownloadManager.Properties {
                 this["DownloadsFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int SearchTimeout {
+            get {
+                return ((int)(this["SearchTimeout"]));
+            }
+            set {
+                this["SearchTimeout"] = value;
+            }
+        }
     }
 }

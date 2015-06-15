@@ -41,7 +41,6 @@ namespace HSDownloadManager
             s.Name = Name.Text;
             s.NextEpisode = int.Parse(NextEpisode.Text);
             s.AirsOn = DateTime.Parse(AirsOn.Text);
-            s.Error = false;
             s.Status = (s.AirsOn < DateTime.Now) ? "Available" : "Unavailable";
 
             if (selectedShow == null)

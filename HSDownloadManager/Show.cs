@@ -11,11 +11,6 @@ namespace HSDownloadManager
 	public class Show : INotifyPropertyChanged
 	{
 
-        public Show()
-        {
-            Error = false;
-        }
-
         [field:NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -55,8 +50,6 @@ namespace HSDownloadManager
             set { SetMember(ref _status, value, "Status"); }
         }
         private string _status;
-
-        public bool Error { get; set; }
 
     }
 }

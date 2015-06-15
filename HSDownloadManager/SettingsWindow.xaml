@@ -21,6 +21,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Column="0" Grid.Row="0">Server URL</TextBlock>
         <TextBox Name="ServerTB" Grid.Column="1" Grid.Row="0" Text="{Binding Server}"/>
@@ -36,6 +37,8 @@
         <TextBox Name="TargetBotTB" Grid.Column="1" Grid.Row="5" Text="{Binding TargetBot}"/>
         <TextBlock Grid.Column="0" Grid.Row="6">Downloads Folder</TextBlock>
         <TextBox Name="DownloadsFolderTB" Grid.Column="1" Grid.Row="6" Text="{Binding DownloadsFolder}"/>
-        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="7">Save</Button>
+        <TextBlock Grid.Column="0" Grid.Row="7">Search Timeout (s)</TextBlock>
+        <TextBox Name="TimeoutTB" Grid.Column="1" Grid.Row="7" Text="{Binding WaitTime}"/>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="8">Save</Button>
     </Grid>
 </Window>

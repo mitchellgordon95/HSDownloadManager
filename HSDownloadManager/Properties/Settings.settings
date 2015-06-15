@@ -23,5 +23,8 @@
     <Setting Name="DownloadsFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Users\Megaflux\Documents\Downloads</Value>
     </Setting>
+    <Setting Name="SearchTimeout" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
