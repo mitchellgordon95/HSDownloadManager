@@ -1,0 +1,29 @@
+﻿<Window x:Class="HSDownloadManager.EditShowWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HSDownloadManager"
+        mc:Ignorable="d"
+        Title="Edit Show" Height="200" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0">Name:</TextBlock>
+        <TextBox Name="Name" Grid.Column="1" Grid.Row="0"></TextBox>
+        <TextBlock Grid.Column="0" Grid.Row="1">Next Episode:</TextBlock>
+        <TextBox Name="NextEpisode" Grid.Column="1" Grid.Row="1"></TextBox>
+        <TextBlock Grid.Column="0" Grid.Row="2">Airs On (mm/dd/yyyy):</TextBlock>
+        <TextBox Name="AirsOn" Grid.Column="1" Grid.Row="2"></TextBox>
+        <Button Click="Delete_Button_Click" Grid.Column="0" Grid.Row="3">Delete</Button>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="3">Save</Button>
+    </Grid>
+</Window>

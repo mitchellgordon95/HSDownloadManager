@@ -19,6 +19,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using HSDownloadManager.Properties;
+using System.ComponentModel;
 
 namespace HSDownloadManager
 {
@@ -28,7 +29,7 @@ namespace HSDownloadManager
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		ObservableCollection<Show> ShowCollection = new ObservableCollection<Show>();
+		public SerializableCollection<Show> ShowCollection = new SerializableCollection<Show>();
         List<Pack> PacksToDownload = new List<Pack>();
 
         // The Show we're currently downloading
@@ -46,10 +47,24 @@ namespace HSDownloadManager
         {
             InitializeComponent();
 
+            try {
+                ShowCollection.LoadFromFile(@".\shows");
+            }
+            catch (Exception e)
+            {
+                // The file doesn't exist, so this is our first time running. That's fine.
+            }
+
             // Connect the ListView to the list of shows we're tracking
             Shows_LV.Items.Clear();
             Shows_LV.ItemsSource = ShowCollection;
-            ShowCollection.Add(new Show { Name = "Denpa Kyoushi", Status = "Unavailable", AirsOn = new DateTime(2015, 6, 13, 5, 0, 0), NextEpisode = 11 });
+
+            // When the user selects a show in the list, bring up an edit dialog.
+            Shows_LV.SelectionChanged += (sender, args) =>
+            {
+                if (args.AddedItems.Count > 0)
+                    new EditShowWindow(args.AddedItems[0] as Show).Show();
+            };
 
             // Update the status of the shows if they've become available.
             foreach (Show s in ShowCollection ) {
@@ -65,6 +80,11 @@ namespace HSDownloadManager
             client.Error += (sender, args) => { MessageBox.Show("Generic error thrown: " + args.Error.Message); };
 
 		}
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            ShowCollection.SaveToFile(@".\shows");
+        }
 
         /// <summary>
         /// Checks if the show has become available and sets its status appropriately.
@@ -340,6 +360,16 @@ namespace HSDownloadManager
 		{
             new SettingsWindow().Show();
 		}
+
+        /// <summary>
+        /// Called when the "Add Show" button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Add_Button_Click(object sender, RoutedEventArgs e)
+        {
+            new EditShowWindow(null).Show();
+        }
 	}
 
 }

@@ -57,11 +57,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EditShowWindow.xaml.cs">
+      <DependentUpon>EditShowWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pack.cs" />
+    <Compile Include="SerializableCollection.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Show.cs" />
+    <Page Include="EditShowWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace HSDownloadManager
 {
-	class Show : INotifyPropertyChanged
+    [Serializable]
+	public class Show : INotifyPropertyChanged
 	{
 
         public Show()
@@ -15,6 +16,7 @@ namespace HSDownloadManager
             Error = false;
         }
 
+        [field:NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void SetMember<T>(ref T mem, T val, string propName)
