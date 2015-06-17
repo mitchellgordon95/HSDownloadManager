@@ -37,15 +37,21 @@ namespace HSDownloadManager
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
         {
-            Show s = (selectedShow == null) ? new HSDownloadManager.Show() : selectedShow;
-            s.Name = Name.Text;
-            s.NextEpisode = int.Parse(NextEpisode.Text);
-            s.AirsOn = DateTime.Parse(AirsOn.Text);
-            s.Status = (s.AirsOn < DateTime.Now) ? "Available" : "Unavailable";
+            try {
+                Show s = (selectedShow == null) ? new HSDownloadManager.Show() : selectedShow;
+                s.Name = Name.Text;
+                s.NextEpisode = int.Parse(NextEpisode.Text);
+                s.AirsOn = DateTime.Parse(AirsOn.Text);
+                s.Status = (s.AirsOn < DateTime.Now) ? "Available" : "Unavailable";
 
-            if (selectedShow == null)
-                Application.Current.Windows.OfType<MainWindow>().ElementAt(0).ShowCollection.Add(s);
-            this.Close();
+                if (selectedShow == null)
+                    Application.Current.Windows.OfType<MainWindow>().ElementAt(0).ShowCollection.Add(s);
+                this.Close();
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show("One of your fields is malformed. You might want to fix it.");
+            }
         }
 
         private void Delete_Button_Click(object sender, RoutedEventArgs e)
