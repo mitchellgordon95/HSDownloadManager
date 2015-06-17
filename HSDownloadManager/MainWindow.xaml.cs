@@ -49,6 +49,11 @@ namespace HSDownloadManager
 
         public MainWindow()
         {
+            // Set the current directory to wherever the executable is located. 
+            // The current directory is sometimes C:\Windows\System32 when the application starts on windows startup
+            string executableDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            Directory.SetCurrentDirectory(executableDir);
+
             InitializeComponent();
 
             try {
@@ -96,7 +101,13 @@ namespace HSDownloadManager
         // Save the show information to the file when the user closes the window.
         protected override void OnClosing(CancelEventArgs e)
         {
-            ShowCollection.SaveToFile(Directory.GetCurrentDirectory() + @"\shows");
+            try {
+                ShowCollection.SaveToFile(Directory.GetCurrentDirectory() + @"\shows");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception: " + ex.Message);
+            }
         }
 
        
