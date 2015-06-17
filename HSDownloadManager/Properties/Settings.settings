@@ -9,7 +9,7 @@
       <Value Profile="(Default)">#horriblesubs</Value>
     </Setting>
     <Setting Name="Nick" Type="System.String" Scope="User">
-      <Value Profile="(Default)">SomeRandomNick</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Pass" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -21,7 +21,7 @@
       <Value Profile="(Default)">HelloKitty</Value>
     </Setting>
     <Setting Name="DownloadsFolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\Megaflux\Documents\Downloads</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SearchTimeout" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>

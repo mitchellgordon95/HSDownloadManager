@@ -49,7 +49,7 @@ namespace HSDownloadManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SomeRandomNick")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Nick {
             get {
                 return ((string)(this["Nick"]));
@@ -97,7 +97,7 @@ namespace HSDownloadManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\Megaflux\\Documents\\Downloads")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string DownloadsFolder {
             get {
                 return ((string)(this["DownloadsFolder"]));

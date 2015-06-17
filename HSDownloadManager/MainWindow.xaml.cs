@@ -387,6 +387,23 @@ namespace HSDownloadManager
                 return;
             }
 
+            // Check that the necessary settings have been filled out
+            if (ShowCollection.Count == 0)
+            {
+                MessageBox.Show("Add some shows first!");
+                return; 
+            }
+            if (settings.Nick == "")
+            {
+                MessageBox.Show("Please enter a nickname in the settings menu.");
+                return;
+            }
+            if (!Directory.Exists(settings.DownloadsFolder))
+            {
+                MessageBox.Show("Please enter a valid folder to download to in the settings menu.");
+                return;
+            }
+
             // Refresh show statuses in case we had an error last time.
             foreach (Show s in ShowCollection)
                 UpdateShowStatus(s);
