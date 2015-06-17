@@ -4,21 +4,23 @@
         Title="HSDownloadManager" Height="350" Width="700">
 	<Grid x:Name="grid">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="200*"/>
-			<ColumnDefinition Width="117*"/>
-			<ColumnDefinition Width="50*"/>
-			<ColumnDefinition Width="80*"/>
-			<ColumnDefinition Width="40*"/>
-			<ColumnDefinition Width="40*"/>
+			<ColumnDefinition Width="350"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="41"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 		<TextBlock Grid.Column="0" Grid.ColumnSpan="5" FontSize="22" Grid.RowSpan="3">Horrible Subs Download Manager</TextBlock>
-        <Button Click="Add_Button_Click" Grid.Column="2">Add Show</Button>
-		<Button Click="Settings_Button_Click" Grid.Column="3" >Settings</Button>
-		<Button Click="Download_Button_Click" Grid.Column="4" Grid.ColumnSpan="2" >Download</Button>
+        <Button Click="Add_Button_Click" Grid.Column="1">Add Show</Button>
+		<Button Click="Settings_Button_Click" Grid.Column="2" >Settings</Button>
+		<Button Click="Download_Button_Click" Grid.Column="3" Grid.ColumnSpan="1" >Download</Button>
+		<Button Click="Cancel_Button_Click" Grid.Column="4" Grid.ColumnSpan="1" >Cancel</Button>
+		<Button Click="Skip_Button_Click" Grid.Column="5" Grid.ColumnSpan="1" >Skip</Button>
 		<ListView x:Name="Shows_LV" Grid.Row="1" Grid.ColumnSpan="6">
 			<ListView.View>
 				<GridView >

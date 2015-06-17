@@ -42,6 +42,17 @@ namespace HSDownloadManager
         // Have we failed downloading the current show?
         bool downloadError = false;
 
+        // Did the user skip the current show?
+        bool skipped = false;
+
+        // The various tasks (and associated cancellation tokens) that will be running while we're in the process of downloading.
+        Task mainTask;
+        CancellationTokenSource mainTaskTokenSource;
+        Task timeoutTask;
+        CancellationTokenSource timeoutTaskTokenSource;
+        Task downloadTask;
+        CancellationTokenSource downloadTaskTokenSource;
+
         IrcDotNet.StandardIrcClient client;
         IrcDotNet.Ctcp.CtcpClient ctcp;
 
@@ -53,7 +64,7 @@ namespace HSDownloadManager
             // The current directory is sometimes C:\Windows\System32 when the application starts on windows startup
             string executableDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Directory.SetCurrentDirectory(executableDir);
-
+            
             InitializeComponent();
 
             try {
@@ -109,89 +120,63 @@ namespace HSDownloadManager
                 MessageBox.Show("Exception: " + ex.Message);
             }
         }
-
-       
-
-		/// <summary>
-		/// Called when the "Download" button is clicked.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void Download_Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (downloading)
-            {
-                MessageBox.Show("Already in the process of downloading.");
-                return;
-            }
-
-            // Refresh show statuses in case we had an error last time.
-            foreach (Show s in ShowCollection)
-                UpdateShowStatus(s);
-
-            // If we're already connected, go ahead and start searching for packs
-            if (client.IsConnected)
-            {
-                Task.Factory.StartNew(() =>
-               {
-                   DownloadAvailableShows(null, null);
-               });
-            }
-            else
-            {
-                // Otherwise, hookup the connected event and connect to the server.
-                Task.Factory.StartNew(() =>
-                {
-                    // When the client is connected, start downloading the packs
-                    client.Connected -= DownloadAvailableShows;
-                    client.Connected += DownloadAvailableShows;
-
-                    // Connect to the server.
-                    string nick = settings.Nick;
-                    client.Connect(new Uri(settings.Server), new IrcUserRegistrationInfo() { NickName = nick, RealName = nick, UserName = nick, Password = settings.Pass });
-                });
-            }
-            
-		}
-
+		
         private void DownloadAvailableShows(object sender, EventArgs args)
         {
-            downloading = true;
+            mainTaskTokenSource = new CancellationTokenSource();
+            var token = mainTaskTokenSource.Token;
+            mainTask = Task.Factory.StartNew(() =>
+           {
+                downloading = true;
+                
+                // Join the channel
+                client.Channels.Join(settings.Channel);
 
-            // Join the channel
-            client.Channels.Join(settings.Channel);
+               foreach (Show s in ShowCollection)
+               {
+                   if (s.Status == "Available")
+                   {
+                       downloadError = false;
+                       skipped = false;
+                       s.Status = "Searching";
 
-            foreach (Show s in ShowCollection)
-            {
-                if (s.Status == "Available")
-                {
-                    downloadError = false;
-                    s.Status = "Searching";
+                        // Ask the channel for the pack number of the episode we're looking for.
+                        nextShow = s;
+                       RequestPackNumber(s);
 
-                    // Ask the channel for the pack number of the episode we're looking for.
-                    nextShow = s;
-                    RequestPackNumber(s);
+                        // Wait for the show to finish downloading before starting the next one.
+                        lock (nextShow)
+                       {
+                           Monitor.Wait(nextShow);
+                           if (skipped)
+                           {
+                               nextShow.Status = "Skipped";
+                               skipped = false;
+                           }
+                           else if (token.IsCancellationRequested)
+                           {
+                               nextShow.Status = "Canceled";
+                               break;
+                           }
 
-                    // Wait for the show to finish downloading before starting the next one.
-                    lock (nextShow)
-                    {
-                        Monitor.Wait(nextShow);
-                        if (downloadError)
-                        {
-                            nextShow.Status = "Error";
-                        }
-                        else
-                        {
-                            nextShow.Status = "Downloaded";
-                            nextShow.NextEpisode++;
-                            nextShow.AirsOn.AddDays(7);
-                        }
-                    }
+                           else if (downloadError)
+                           {
+                               nextShow.Status = "Error";
+                           }
+                           else
+                           {
+                               nextShow.Status = "Downloaded";
+                               nextShow.NextEpisode++;
+                               nextShow.AirsOn.AddDays(7);
+                           }
+                       }
 
-                }
-            }
+                   }
+               }
 
-            downloading = false;
+               downloading = false;
+           }, token);
+
         }
 
         /// <summary>
@@ -205,13 +190,25 @@ namespace HSDownloadManager
             client.LocalUser.SendMessage(settings.Channel, "@find " + s.Name + " " + episodeNumber + " " + settings.Resolution);
 
             // If we don't find the pack number in less than 10 seconds, throw an error
-            Task t = Task.Factory.StartNew(() =>
+            timeoutTaskTokenSource = new CancellationTokenSource();
+            var token = timeoutTaskTokenSource.Token;
+            timeoutTask = Task.Factory.StartNew(() =>
            {
                Thread.Sleep(settings.SearchTimeout * 1000);
+
+               // If we got canceled, don't worry about setting errors.
+               if (token.IsCancellationRequested)
+                   return;
+
                lock (nextShow)
                {
                    if (!nextShow.Status.Contains("Download")) // Downloading or Downloaded
                    {
+                       // Remove the handlers
+                       client.LocalUser.NoticeReceived -= AcceptPackNumber;
+                       ctcp.RawMessageReceived -= AcceptDownloadRequest;
+
+                       // Show a popup depending on what the problem is.
                        if (nextShow.Status == "Searching")
                            Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + nextShow.Name + " episode " + nextShow.NextEpisode));
                        if (nextShow.Status == "Requesting")
@@ -220,7 +217,7 @@ namespace HSDownloadManager
                        Monitor.Pulse(nextShow);
                    }
                }
-           });
+           }, timeoutTaskTokenSource.Token);
         }
 
         /// <summary>
@@ -235,14 +232,14 @@ namespace HSDownloadManager
 
             lock (nextShow)
             {
-                Pack nextPack = new Pack();
-                Show s = nextPack.Show = nextShow;
 
                 string text = e.Text.ToLower();
 
                 // If the response is for the show we're looking for, and we haven't already started downloading the show
-                if (s.Status == "Searching" && text.Contains(settings.TargetBot.ToLower()) && text.Contains(s.Name.ToLower()))
+                if (nextShow.Status == "Searching" && text.Contains(settings.TargetBot.ToLower()) && text.Contains(nextShow.Name.ToLower()))
                 {
+                    Pack nextPack = new Pack();
+                    nextPack.Show = nextShow;
                     int packStart = text.IndexOf('#');
                     int packEnd = packStart + 1;
                     while (packEnd + 1 < text.Length && char.IsDigit(text.ElementAt(packEnd + 1)))
@@ -252,9 +249,9 @@ namespace HSDownloadManager
 
                     nextPack.Target = settings.TargetBot;
 
-                    RequestDownloadPack(nextPack);
-
                     client.LocalUser.NoticeReceived -= AcceptPackNumber;
+
+                    RequestDownloadPack(nextPack);
                 }
             }
         }
@@ -287,89 +284,141 @@ namespace HSDownloadManager
             string msg = e.Message.Data;
             if (msg != null && msg.StartsWith("SEND"))
             {
-                ctcp.RawMessageReceived -= AcceptDownloadRequest;
+                downloadTaskTokenSource = new CancellationTokenSource();
+                var token = downloadTaskTokenSource.Token;
+                downloadTask = Task.Factory.StartNew(() =>
+               {
+                   ctcp.RawMessageReceived -= AcceptDownloadRequest;
 
-                lock (nextShow)
-                {
-                    nextShow.Status = "Downloading";
-                }
+                   lock (nextShow)
+                   {
+                       nextShow.Status = "Downloading";
+                   }
 
-                // It's a DCC SEND request. The format is "SEND [Filename] [IP Integer] [Port number] [File Size]"
-                int spaceAfterFilename = msg.Length;
-                for (int i = 0; i < 3; ++i)
-                    spaceAfterFilename = msg.LastIndexOf(' ', spaceAfterFilename - 1);
+                    // It's a DCC SEND request. The format is "SEND [Filename] [IP Integer] [Port number] [File Size]"
+                    int spaceAfterFilename = msg.Length;
+                   for (int i = 0; i < 3; ++i)
+                       spaceAfterFilename = msg.LastIndexOf(' ', spaceAfterFilename - 1);
 
-                string[] parts = msg.Substring(spaceAfterFilename + 1).Split(' ');
+                   string[] parts = msg.Substring(spaceAfterFilename + 1).Split(' ');
 
-                UInt32 ipInt = UInt32.Parse(parts[0]);
-                int port = int.Parse(parts[1]);
-                int fileSize = int.Parse(parts[2]);
-                string filename = msg.Substring(5, spaceAfterFilename - 5);
+                   UInt32 ipInt = UInt32.Parse(parts[0]);
+                   int port = int.Parse(parts[1]);
+                   int fileSize = int.Parse(parts[2]);
+                   string filename = msg.Substring(5, spaceAfterFilename - 5);
 
-                // Strip quotes from the file name
-                if (filename.ElementAt(0) == '"')
-                    filename = filename.Substring(1, filename.Length - 2);
+                    // Strip quotes from the file name
+                    if (filename.ElementAt(0) == '"')
+                       filename = filename.Substring(1, filename.Length - 2);
 
-                // Convert the ip address integer to an actual ip address.
-                byte[] bytes = BitConverter.GetBytes(ipInt);
+                    // Convert the ip address integer to an actual ip address.
+                    byte[] bytes = BitConverter.GetBytes(ipInt);
 
-                // The integer value must be in big endian format to be properly converted.
-                if (BitConverter.IsLittleEndian)
-                    Array.Reverse(bytes);
+                    // The integer value must be in big endian format to be properly converted.
+                    if (BitConverter.IsLittleEndian)
+                       Array.Reverse(bytes);
 
-                IPAddress ipAdd = new IPAddress(bytes);
+                   IPAddress ipAdd = new IPAddress(bytes);
 
-                Console.WriteLine("Received DCC SEND request for file " + filename + " at " + ipAdd.ToString() + ":" + port);
+                   Console.WriteLine("Received DCC SEND request for file " + filename + " at " + ipAdd.ToString() + ":" + port);
 
-                try {
-                    // Open a file for writing
-                    string fullFilename = settings.DownloadsFolder + @"\" + filename;
-                    while (File.Exists(fullFilename))
-                        fullFilename += ".1";
-                    FileStream file = System.IO.File.Open(fullFilename, System.IO.FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+                   try
+                   {
+                        // Open a file for writing
+                        string fullFilename = settings.DownloadsFolder + @"\" + filename;
+                       while (File.Exists(fullFilename))
+                           fullFilename += ".1";
+                       FileStream file = System.IO.File.Open(fullFilename, System.IO.FileMode.CreateNew, FileAccess.Write, FileShare.Read);
 
-                    // Connect to the XDCC server on the specified ip and port
-                    IPEndPoint endPt = new IPEndPoint(ipAdd, port);
-                    Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                    sock.Connect(endPt);
+                        // Connect to the XDCC server on the specified ip and port
+                        IPEndPoint endPt = new IPEndPoint(ipAdd, port);
+                       Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                       sock.Connect(endPt);
 
-                    // Read the data into the file
-                    byte[] buffer = new byte[1024];
-                    int bytesRead, totalBytesRead = 0;
-                    while ((bytesRead = sock.Receive(buffer)) > 0 && totalBytesRead < fileSize)
-                    {
-                        file.Write(buffer, 0, bytesRead);
-                        totalBytesRead += bytesRead;
+                        // Read the data into the file
+                        byte[] buffer = new byte[1024];
+                       int bytesRead, totalBytesRead = 0;
+                       while ((bytesRead = sock.Receive(buffer)) > 0 && totalBytesRead < fileSize)
+                       {
+                           file.Write(buffer, 0, bytesRead);
+                           totalBytesRead += bytesRead;
 
-                        nextShow.Status = "Downloading (" + totalBytesRead / (1024 * 1024) + " MB)";
-                    }
+                           // If we get cancelled, close the sock and quit.
+                           if (token.IsCancellationRequested)
+                           {
+                               sock.Close();
+                               break;
+                           }
 
-                    file.Close();
-                }
-                catch (Exception err)
-                {
-                    MessageBox.Show("Exception thrown: " + err.Message);
+                           nextShow.Status = "Downloading (" + totalBytesRead / (1024 * 1024) + " MB)";
+                       }
+
+                       file.Close();
+                   }
+                   catch (Exception err)
+                   {
+                       MessageBox.Show("Exception thrown: " + err.Message);
+                       lock (nextShow)
+                       {
+                           downloadError = true;
+                       }
+                   }
+
+                    // Signal the main loop that the show has finished downloading.
                     lock (nextShow)
-                    {
-                        downloadError = true;
-                    }
-                }
-
-                // Signal the main loop that the show has finished downloading.
-                lock (nextShow)
-                {
-                    Monitor.Pulse(nextShow);
-                }
+                   {
+                       Monitor.Pulse(nextShow);
+                   }
+               });
 
             }
         }
 
-		/// <summary>
-		/// Called when the "Settings" button is clicked.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void Settings_Button_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Called when the "Download" button is clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Download_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (downloading)
+            {
+                MessageBox.Show("Already in the process of downloading.");
+                return;
+            }
+
+            // Refresh show statuses in case we had an error last time.
+            foreach (Show s in ShowCollection)
+                UpdateShowStatus(s);
+
+            // If we're already connected, go ahead and start searching for packs
+            if (client.IsConnected)
+            {
+                DownloadAvailableShows(null, null);
+            }
+            else
+            {
+                // Otherwise, hookup the connected event and connect to the server.
+                Task.Factory.StartNew(() =>
+                {
+                    // When the client is connected, start downloading the packs
+                    client.Connected -= DownloadAvailableShows;
+                    client.Connected += DownloadAvailableShows;
+
+                    // Connect to the server.
+                    string nick = settings.Nick;
+                    client.Connect(new Uri(settings.Server), new IrcUserRegistrationInfo() { NickName = nick, RealName = nick, UserName = nick, Password = settings.Pass });
+                });
+            }
+
+        }
+
+        /// <summary>
+        /// Called when the "Settings" button is clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Settings_Button_Click(object sender, RoutedEventArgs e)
 		{
             SettingsWindow win = new SettingsWindow();
             win.Owner = this;
@@ -384,6 +433,69 @@ namespace HSDownloadManager
         void Add_Button_Click(object sender, RoutedEventArgs e)
         {
             new EditShowWindow(null).Show();
+        }
+
+        /// <summary>
+        /// Called when the "Cancel" button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (!downloading)
+            {
+                MessageBox.Show("You can't cancel because I'm not downloading anything.");
+                return;
+            }
+
+            StopCurrentDownload(CancelOrSkip.Cancel);
+        }
+
+        /// <summary>
+        /// Called when the "Skip" button is clicked. Skips downloading the current episode
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Skip_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (!downloading)
+            {
+                MessageBox.Show("You can't skip because I'm not downloading anything.");
+                return;
+            }
+
+            StopCurrentDownload(CancelOrSkip.Skip);
+        }
+
+        enum CancelOrSkip
+        {
+            Cancel,
+            Skip
+        }
+        private void StopCurrentDownload(CancelOrSkip cos)
+        {
+            // If we're canceling, cancel the main task. 
+            if (cos == CancelOrSkip.Cancel && mainTaskTokenSource != null)
+                mainTaskTokenSource.Cancel();
+            // Set the skip flag
+            else if (cos == CancelOrSkip.Skip)
+                skipped = true;
+
+            // Remove the message and download handlers
+            client.LocalUser.NoticeReceived -= AcceptPackNumber;
+            ctcp.RawMessageReceived -= AcceptDownloadRequest;
+            // Cancel the search timeout task
+            if (timeoutTaskTokenSource != null)
+                timeoutTaskTokenSource.Cancel();
+            // Cancel the download handler
+            if (downloadTaskTokenSource != null)
+                downloadTaskTokenSource.Cancel();
+
+            // Bump the main thread to move on.
+            lock (nextShow)
+            {
+                Monitor.Pulse(nextShow);
+            }
         }
 
         /// <summary>
