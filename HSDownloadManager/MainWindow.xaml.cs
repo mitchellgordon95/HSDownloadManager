@@ -167,7 +167,7 @@ namespace HSDownloadManager
                            {
                                nextShow.Status = "Downloaded";
                                nextShow.NextEpisode++;
-                               nextShow.AirsOn.AddDays(7);
+                               nextShow.AirsOn = nextShow.AirsOn.AddDays(7);
                            }
                        }
 
