@@ -26,7 +26,7 @@
 				<GridView >
 					<GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name}"/>
 					<GridViewColumn Header="Next Episode" Width="120" DisplayMemberBinding="{Binding NextEpisode}"/>
-                    <GridViewColumn Header="Air Date" Width="120" DisplayMemberBinding="{Binding Path=AirsOn, StringFormat=d}"/>
+                    <GridViewColumn Header="Airs On" Width="120" DisplayMemberBinding="{Binding Path=AirsOn, StringFormat=g}"/>
 					<GridViewColumn Header="Status" Width="180" DisplayMemberBinding="{Binding Status}"/>
 				</GridView>
 			</ListView.View>

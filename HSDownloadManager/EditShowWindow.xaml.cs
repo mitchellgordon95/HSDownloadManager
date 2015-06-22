@@ -32,6 +32,7 @@ namespace HSDownloadManager
                 Name.Text = s.Name;
                 NextEpisode.Text = s.NextEpisode.ToString();
                 AirsOn.Text = s.AirsOn.ToString();
+                Hour.Text = s.AirsOn.Hour.ToString();
             }
         }
 
@@ -42,6 +43,7 @@ namespace HSDownloadManager
                 s.Name = Name.Text;
                 s.NextEpisode = int.Parse(NextEpisode.Text);
                 s.AirsOn = DateTime.Parse(AirsOn.Text);
+                s.AirsOn = s.AirsOn.AddHours(int.Parse(Hour.Text));
                 s.Status = (s.AirsOn < DateTime.Now) ? "Available" : "Unavailable";
 
                 if (selectedShow == null)

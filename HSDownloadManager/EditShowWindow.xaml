@@ -16,14 +16,17 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Column="0" Grid.Row="0">Name:</TextBlock>
         <TextBox Name="Name" Grid.Column="1" Grid.Row="0"></TextBox>
         <TextBlock Grid.Column="0" Grid.Row="1">Next Episode:</TextBlock>
         <TextBox Name="NextEpisode" Grid.Column="1" Grid.Row="1"></TextBox>
         <TextBlock Grid.Column="0" Grid.Row="2">Airs On (mm/dd/yyyy):</TextBlock>
-        <TextBox Name="AirsOn" Grid.Column="1" Grid.Row="2"></TextBox>
-        <Button Click="Delete_Button_Click" Grid.Column="0" Grid.Row="3">Delete</Button>
-        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="3">Save</Button>
+        <DatePicker Name="AirsOn" Grid.Column="1" Grid.Row="2"></DatePicker>
+        <TextBlock Grid.Column="0" Grid.Row="3">Hour (0 - 24)</TextBlock>
+        <TextBox Name="Hour" Grid.Column="1" Grid.Row="3">0</TextBox>
+        <Button Click="Delete_Button_Click" Grid.Column="0" Grid.Row="4">Delete</Button>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="4">Save</Button>
     </Grid>
 </Window>
