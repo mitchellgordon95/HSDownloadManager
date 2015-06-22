@@ -56,6 +56,13 @@ namespace HSDownloadManager
             }
         }
 
+        private void Downloads_Folder_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog diag = new System.Windows.Forms.FolderBrowserDialog();
+            if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                DownloadsFolderTB.Text = diag.SelectedPath;
+        }
+
         private void Import_Shows_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog diag = new OpenFileDialog();

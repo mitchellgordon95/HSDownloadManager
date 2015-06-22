@@ -39,7 +39,10 @@
         <TextBlock Grid.Column="0" Grid.Row="5">Target Bot</TextBlock>
         <TextBox Name="TargetBotTB" Grid.Column="1" Grid.Row="5" Text="{Binding TargetBot}"/>
         <TextBlock Grid.Column="0" Grid.Row="6">Downloads Folder</TextBlock>
-        <TextBox Name="DownloadsFolderTB" Grid.Column="1" Grid.Row="6" Text="{Binding DownloadsFolder}"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="6">
+            <TextBox Name="DownloadsFolderTB" Width="100"  Text="{Binding DownloadsFolder}"/>
+            <Button Click="Downloads_Folder_Click">Browse</Button>
+        </StackPanel>
         <TextBlock Grid.Column="0" Grid.Row="7">Search Timeout (s)</TextBlock>
         <TextBox Name="TimeoutTB" Grid.Column="1" Grid.Row="7" Text="{Binding SearchTimeout}"/>
         <TextBlock Grid.Column="0" Grid.Row="8">Run On Windows Startup?</TextBlock>
