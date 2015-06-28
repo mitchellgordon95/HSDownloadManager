@@ -189,9 +189,8 @@ namespace HSDownloadManager
         /// <param name="s"></param>
         void RequestPackNumber(Show s)
         {
-            string episodeNumber = (s.NextEpisode > 9) ? s.NextEpisode.ToString() : "0" + s.NextEpisode.ToString();
             client.LocalUser.NoticeReceived += AcceptPackNumber;
-            client.LocalUser.SendMessage(settings.Channel, "@find " + s.Name + " " + episodeNumber + " " + settings.Resolution);
+            client.LocalUser.SendMessage(settings.Channel, "@find " + s.Name + " " + GetSearchableString(s.NextEpisode) + " " + settings.Resolution);
 
             // If we don't find the pack number from our preferred bot in less than a certain amount of time, either download a non preferred pack or throw an error
             searchTimeoutTokenSource = new CancellationTokenSource();
@@ -244,7 +243,7 @@ namespace HSDownloadManager
                 string text = e.Text.ToLower();
 
                 // If the response is for the show we're looking for, and we haven't already started downloading the show
-                if (nextShow.Status == "Searching" && text.Contains(nextShow.Name.ToLower()))
+                if (nextShow.Status == "Searching" && text.Contains(nextShow.Name.ToLower()) && text.Contains(" " + GetSearchableString(nextShow.NextEpisode) + " "))
                 {
 
                     Pack nextPack = new Pack();
@@ -581,6 +580,11 @@ namespace HSDownloadManager
                 s.Status = "Available";
             else
                 s.Status = "Unavailable";
+        }
+
+        string GetSearchableString(int episodeNumber)
+        {
+            return (episodeNumber > 9) ? episodeNumber.ToString() : "0" + episodeNumber.ToString();
         }
     }
 
