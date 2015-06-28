@@ -36,8 +36,8 @@
         <TextBox Name="PassTB" Grid.Column="1" Grid.Row="3" Text="{Binding Pass}"/>
         <TextBlock Grid.Column="0" Grid.Row="4">Resolution</TextBlock>
         <TextBox Name="ResolutionTB" Grid.Column="1" Grid.Row="4" Text="{Binding Resolution}"/>
-        <TextBlock Grid.Column="0" Grid.Row="5">Target Bot</TextBlock>
-        <TextBox Name="TargetBotTB" Grid.Column="1" Grid.Row="5" Text="{Binding TargetBot}"/>
+        <TextBlock Grid.Column="0" Grid.Row="5">Preferred Bot</TextBlock>
+        <TextBox Name="PreferredBotTB" Grid.Column="1" Grid.Row="5" Text="{Binding PreferredBot}"/>
         <TextBlock Grid.Column="0" Grid.Row="6">Downloads Folder</TextBlock>
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="6">
             <TextBox Name="DownloadsFolderTB" Width="100"  Text="{Binding DownloadsFolder}"/>

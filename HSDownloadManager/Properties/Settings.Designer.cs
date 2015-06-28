@@ -86,12 +86,12 @@ namespace HSDownloadManager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("HelloKitty")]
-        public string TargetBot {
+        public string PreferredBot {
             get {
-                return ((string)(this["TargetBot"]));
+                return ((string)(this["PreferredBot"]));
             }
             set {
-                this["TargetBot"] = value;
+                this["PreferredBot"] = value;
             }
         }
         
@@ -109,7 +109,7 @@ namespace HSDownloadManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int SearchTimeout {
             get {
                 return ((int)(this["SearchTimeout"]));

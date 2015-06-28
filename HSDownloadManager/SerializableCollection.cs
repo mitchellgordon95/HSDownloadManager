@@ -23,7 +23,6 @@ namespace HSDownloadManager
             try
             {
                 IFormatter formatter = new BinaryFormatter();
-                // IFormatter formatter = new SoapFormatter();
                 Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 ObservableCollection<T> list = (ObservableCollection<T>)formatter.Deserialize(stream);
                 foreach (T o in list)

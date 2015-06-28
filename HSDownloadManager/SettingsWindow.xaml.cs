@@ -35,7 +35,7 @@ namespace HSDownloadManager
                 set.Nick = NickTB.Text;
                 set.Pass = PassTB.Text;
                 set.Resolution = ResolutionTB.Text;
-                set.TargetBot = TargetBotTB.Text;
+                set.PreferredBot = PreferredBotTB.Text;
                 set.DownloadsFolder = DownloadsFolderTB.Text;
                 set.SearchTimeout = int.Parse(TimeoutTB.Text);
                 set.RunOnWindowsStartup = RunOnWindowsStartupCB.IsChecked.Value;

@@ -17,14 +17,14 @@
     <Setting Name="Resolution" Type="System.String" Scope="User">
       <Value Profile="(Default)">720</Value>
     </Setting>
-    <Setting Name="TargetBot" Type="System.String" Scope="User">
+    <Setting Name="PreferredBot" Type="System.String" Scope="User">
       <Value Profile="(Default)">HelloKitty</Value>
     </Setting>
     <Setting Name="DownloadsFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SearchTimeout" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">20</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="RunOnWindowsStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

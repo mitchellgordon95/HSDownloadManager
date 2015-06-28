@@ -31,7 +31,9 @@ namespace HSDownloadManager
 	public partial class MainWindow : Window
 	{
 		public SerializableCollection<Show> ShowCollection = new SerializableCollection<Show>();
-        List<Pack> PacksToDownload = new List<Pack>();
+
+        // The list of packs that didn't come from our preferred bot
+        List<Pack> NonPreferredPacks = new List<Pack>();
 
         // The Show we're currently downloading
         Show nextShow;
@@ -48,8 +50,10 @@ namespace HSDownloadManager
         // The various tasks (and associated cancellation tokens) that will be running while we're in the process of downloading.
         Task mainTask;
         CancellationTokenSource mainTaskTokenSource;
-        Task timeoutTask;
-        CancellationTokenSource timeoutTaskTokenSource;
+        Task searchTimeoutTask;
+        CancellationTokenSource searchTimeoutTokenSource;
+        Task downloadTimeoutTask;
+        CancellationTokenSource downloadTimeoutTokenSource;
         Task downloadTask;
         CancellationTokenSource downloadTaskTokenSource;
 
@@ -189,10 +193,10 @@ namespace HSDownloadManager
             client.LocalUser.NoticeReceived += AcceptPackNumber;
             client.LocalUser.SendMessage(settings.Channel, "@find " + s.Name + " " + episodeNumber + " " + settings.Resolution);
 
-            // If we don't find the pack number in less than 10 seconds, throw an error
-            timeoutTaskTokenSource = new CancellationTokenSource();
-            var token = timeoutTaskTokenSource.Token;
-            timeoutTask = Task.Factory.StartNew(() =>
+            // If we don't find the pack number from our preferred bot in less than a certain amount of time, either download a non preferred pack or throw an error
+            searchTimeoutTokenSource = new CancellationTokenSource();
+            var token = searchTimeoutTokenSource.Token;
+            searchTimeoutTask = Task.Factory.StartNew(() =>
            {
                Thread.Sleep(settings.SearchTimeout * 1000);
 
@@ -202,22 +206,27 @@ namespace HSDownloadManager
 
                lock (nextShow)
                {
-                   if (!nextShow.Status.Contains("Download")) // Downloading or Downloaded
+                   if (nextShow.Status.Equals("Searching")) // If we're still searching.
                    {
-                       // Remove the handlers
+                       // Remove the handler
                        client.LocalUser.NoticeReceived -= AcceptPackNumber;
-                       ctcp.RawMessageReceived -= AcceptDownloadRequest;
+        
+                       // We didn't find a pack from our preferred bot. Check if there are any alternatives.
+                       if (NonPreferredPacks.Count > 0)
+                       {
+                           // If there are, start downloading the first one we found.
+                           RequestDownloadPack(NonPreferredPacks[0]);
+                           NonPreferredPacks.Clear();
+                           return;
+                       }
 
-                       // Show a popup depending on what the problem is.
-                       if (nextShow.Status == "Searching")
-                           Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + nextShow.Name + " episode " + nextShow.NextEpisode));
-                       if (nextShow.Status == "Requesting")
-                           Task.Factory.StartNew(() => MessageBox.Show("Bot did not respond to XDCC SEND request for " + nextShow.Name + " episode " + nextShow.NextEpisode));
+                       // Otherwise, show a popup describing the problem 
+                       Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + nextShow.Name + " episode " + nextShow.NextEpisode));
                        downloadError = true;
                        Monitor.Pulse(nextShow);
                    }
                }
-           }, timeoutTaskTokenSource.Token);
+           }, searchTimeoutTokenSource.Token);
         }
 
         /// <summary>
@@ -232,12 +241,12 @@ namespace HSDownloadManager
 
             lock (nextShow)
             {
-
                 string text = e.Text.ToLower();
 
                 // If the response is for the show we're looking for, and we haven't already started downloading the show
-                if (nextShow.Status == "Searching" && text.Contains(settings.TargetBot.ToLower()) && text.Contains(nextShow.Name.ToLower()))
+                if (nextShow.Status == "Searching" && text.Contains(nextShow.Name.ToLower()))
                 {
+
                     Pack nextPack = new Pack();
                     nextPack.Show = nextShow;
                     int packStart = text.IndexOf('#');
@@ -247,11 +256,28 @@ namespace HSDownloadManager
 
                     nextPack.Number = text.Substring(packStart + 1, packEnd - packStart);
 
-                    nextPack.Target = settings.TargetBot;
+                    // Extract the target bots name. Almost all messages contain "/msg [botname]"
+                    int tagStart = text.IndexOf("/msg ");
+                    int botStart = tagStart + 5;
+                    int botEnd = text.IndexOf(' ', botStart);
+                    if (tagStart != -1)
+                        nextPack.Target = text.Substring(botStart, botEnd - botStart);
+                    else // If the message doesn't contain /msg, use the bot's nickname
+                        nextPack.Target = e.Source.ToString();
 
-                    client.LocalUser.NoticeReceived -= AcceptPackNumber;
+                    // If the target bot of this pack is our preferred bot, start the download immediately.
+                    if (nextPack.Target.Equals(settings.PreferredBot.ToLower())) {
+                        // Clear the list of packs we might have accumulated
+                        NonPreferredPacks.Clear();
+                        RequestDownloadPack(nextPack);
+                        client.LocalUser.NoticeReceived -= AcceptPackNumber;
+                    }
+                    else
+                    {
+                        // Otherwise, add the pack to the list of packs we know about
+                        NonPreferredPacks.Add(nextPack);
+                    }
 
-                    RequestDownloadPack(nextPack);
                 }
             }
         }
@@ -269,6 +295,33 @@ namespace HSDownloadManager
             ctcp.RawMessageReceived += AcceptDownloadRequest;
 
             client.LocalUser.SendMessage(p.Target, "xdcc send " + p.Number);
+
+            // If we don't get a download request in less than a certain amount of time, throw an error
+            downloadTimeoutTokenSource = new CancellationTokenSource();
+            var token = downloadTimeoutTokenSource.Token;
+            downloadTimeoutTask = Task.Factory.StartNew(() =>
+           {
+               Thread.Sleep(settings.SearchTimeout * 1000);
+
+               // If we got canceled, don't worry about setting errors.
+               if (token.IsCancellationRequested)
+                   return;
+
+               lock (nextShow)
+               {
+                   if (nextShow.Status.Equals("Requesting")) // If we're still waiting for the download to start
+                   {
+                       // Remove the handler
+                       ctcp.RawMessageReceived -= AcceptDownloadRequest;
+        
+                       // Otherwise, show a popup describing the problem 
+                       Task.Factory.StartNew(() => MessageBox.Show("Bot did not respond to XDCC SEND request for " + nextShow.Name + " episode " + nextShow.NextEpisode));
+                       downloadError = true;
+                       Monitor.Pulse(nextShow);
+                   }
+               }
+           }, downloadTimeoutTokenSource.Token);
+
         }
 
         /// <summary>
@@ -502,8 +555,11 @@ namespace HSDownloadManager
             client.LocalUser.NoticeReceived -= AcceptPackNumber;
             ctcp.RawMessageReceived -= AcceptDownloadRequest;
             // Cancel the search timeout task
-            if (timeoutTaskTokenSource != null)
-                timeoutTaskTokenSource.Cancel();
+            if (searchTimeoutTokenSource != null)
+                searchTimeoutTokenSource.Cancel();
+            // Cancel the download timeout task
+            if (downloadTimeoutTokenSource != null)
+                downloadTimeoutTokenSource.Cancel();
             // Cancel the download handler
             if (downloadTaskTokenSource != null)
                 downloadTaskTokenSource.Cancel();
