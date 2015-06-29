@@ -40,6 +40,7 @@ namespace HSDownloadManager
                 set.SearchTimeout = int.Parse(TimeoutTB.Text);
                 set.RunOnWindowsStartup = RunOnWindowsStartupCB.IsChecked.Value;
                 set.DownloadOnStartup = DownloadOnStartupCB.IsChecked.Value;
+                set.KeepDownloading = KeepDownloadingCB.IsChecked.Value;
 
                 set.Save();
 

@@ -6,13 +6,14 @@
         xmlns:local="clr-namespace:HSDownloadManager"
         xmlns:properties="clr-namespace:HSDownloadManager.Properties"
         mc:Ignorable="d"
-        Title="Settings" Height="300" Width="300">
+        Title="Settings" Height="300" Width="400">
     <Grid DataContext="{Binding Source={x:Static properties:Settings.Default}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
@@ -49,8 +50,10 @@
         <CheckBox Name="RunOnWindowsStartupCB" Grid.Column="1" Grid.Row="8" IsChecked="{Binding RunOnWindowsStartup}"></CheckBox>
         <TextBlock Grid.Column="0" Grid.Row="9">Download on Startup?</TextBlock>
         <CheckBox Name="DownloadOnStartupCB" Grid.Column="1" Grid.Row="9" IsChecked="{Binding DownloadOnStartup}"></CheckBox>
-        <Button Click="Import_Shows_Click" Grid.Column="0" Grid.Row="10">Import Shows</Button>
-        <Button Click="Export_Shows_Click" Grid.Column="1" Grid.Row="10">Export Shows</Button>
-        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="11">Save</Button>
+        <TextBlock Grid.Column="0" Grid.Row="10">Keep Downloading While Available? </TextBlock>
+        <CheckBox Name="KeepDownloadingCB" Grid.Column="1" Grid.Row="10" IsChecked="{Binding KeepDownloading}"></CheckBox>
+        <Button Click="Import_Shows_Click" Grid.Column="0" Grid.Row="11">Import Shows</Button>
+        <Button Click="Export_Shows_Click" Grid.Column="1" Grid.Row="11">Export Shows</Button>
+        <Button Click="Save_Button_Click" Grid.Column="1" Grid.Row="12">Save</Button>
     </Grid>
 </Window>

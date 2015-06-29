@@ -142,5 +142,17 @@ namespace HSDownloadManager.Properties {
                 this["DownloadOnStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool KeepDownloading {
+            get {
+                return ((bool)(this["KeepDownloading"]));
+            }
+            set {
+                this["KeepDownloading"] = value;
+            }
+        }
     }
 }

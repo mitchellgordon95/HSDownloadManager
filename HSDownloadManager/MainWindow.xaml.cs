@@ -136,47 +136,58 @@ namespace HSDownloadManager
                 // Join the channel
                 client.Channels.Join(settings.Channel);
 
-               foreach (Show s in ShowCollection)
+               bool somethingDownloaded;
+               // Keep looping over the shows collection and downloading episodes if they're still available.
+               do
                {
-                   if (s.Status == "Available")
+                   somethingDownloaded = false;
+
+                   foreach (Show s in ShowCollection)
                    {
-                       downloadError = false;
-                       skipped = false;
-                       s.Status = "Searching";
+                       if (s.Status.Equals("Downloaded"))
+                          UpdateShowStatus(s);
 
-                        // Ask the channel for the pack number of the episode we're looking for.
-                        nextShow = s;
-                       RequestPackNumber(s);
-
-                        // Wait for the show to finish downloading before starting the next one.
-                        lock (nextShow)
+                       if (s.Status == "Available")
                        {
-                           Monitor.Wait(nextShow);
-                           if (skipped)
+                           downloadError = false;
+                           skipped = false;
+                           s.Status = "Searching";
+
+                           // Ask the channel for the pack number of the episode we're looking for.
+                           nextShow = s;
+                           RequestPackNumber(s);
+
+                           // Wait for the show to finish downloading before starting the next one.
+                           lock (nextShow)
                            {
-                               nextShow.Status = "Skipped";
-                               skipped = false;
-                           }
-                           else if (token.IsCancellationRequested)
-                           {
-                               nextShow.Status = "Canceled";
-                               break;
+                               Monitor.Wait(nextShow);
+                               if (skipped)
+                               {
+                                   nextShow.Status = "Skipped";
+                                   skipped = false;
+                               }
+                               else if (token.IsCancellationRequested)
+                               {
+                                   nextShow.Status = "Canceled";
+                                   break;
+                               }
+
+                               else if (downloadError)
+                               {
+                                   nextShow.Status = "Error";
+                               }
+                               else
+                               {
+                                   nextShow.Status = "Downloaded";
+                                   nextShow.NextEpisode++;
+                                   nextShow.AirsOn = nextShow.AirsOn.AddDays(7);
+                                   somethingDownloaded = true;
+                               }
                            }
 
-                           else if (downloadError)
-                           {
-                               nextShow.Status = "Error";
-                           }
-                           else
-                           {
-                               nextShow.Status = "Downloaded";
-                               nextShow.NextEpisode++;
-                               nextShow.AirsOn = nextShow.AirsOn.AddDays(7);
-                           }
                        }
-
                    }
-               }
+               } while (settings.KeepDownloading && somethingDownloaded);
 
                downloading = false;
            }, token);
@@ -390,7 +401,7 @@ namespace HSDownloadManager
                         // Read the data into the file
                         byte[] buffer = new byte[1024];
                        int bytesRead, totalBytesRead = 0;
-                       while ((bytesRead = sock.Receive(buffer)) > 0 && totalBytesRead < fileSize)
+                       while (totalBytesRead < fileSize && (bytesRead = sock.Receive(buffer)) > 0)
                        {
                            file.Write(buffer, 0, bytesRead);
                            totalBytesRead += bytesRead;
@@ -406,6 +417,7 @@ namespace HSDownloadManager
                        }
 
                        file.Close();
+                       sock.Close();
                    }
                    catch (Exception err)
                    {
