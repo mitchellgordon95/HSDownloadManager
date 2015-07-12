@@ -237,7 +237,10 @@ namespace HSDownloadManager
                        }
 
                        // Otherwise, show a popup describing the problem 
-                       Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + nextShow.Name + " episode " + nextShow.NextEpisode));
+                       // We have to capture the current show's name and episode or else it will change by the time the popup opens.
+                       string name = nextShow.Name;
+                       int episode = nextShow.NextEpisode;
+                       Task.Factory.StartNew(() => MessageBox.Show("Unable to find pack number for " + name + " episode " + episode));
                        downloadError = true;
                        Monitor.Pulse(nextShow);
                    }
@@ -331,7 +334,10 @@ namespace HSDownloadManager
                        ctcp.RawMessageReceived -= AcceptDownloadRequest;
         
                        // Otherwise, show a popup describing the problem 
-                       Task.Factory.StartNew(() => MessageBox.Show("Bot did not respond to XDCC SEND request for " + nextShow.Name + " episode " + nextShow.NextEpisode));
+                       // We have to capture the current show's name and episode or else it will change by the time the popup opens.
+                       string name = nextShow.Name;
+                       int episode = nextShow.NextEpisode;
+                       Task.Factory.StartNew(() => MessageBox.Show("Bot failed to start download for " + name + " episode " + episode));
                        downloadError = true;
                        Monitor.Pulse(nextShow);
                    }
