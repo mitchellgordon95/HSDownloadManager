@@ -145,7 +145,13 @@ namespace HSDownloadManager
                    foreach (Show s in ShowCollection)
                    {
                        if (s.Status.Equals("Downloaded"))
-                          UpdateShowStatus(s);
+                       {
+                           UpdateShowStatus(s);
+
+                           // If we downloaded the show and it's become unavailable, we still want the status to say "Downloaded"
+                           if (s.Status == "Unavailable")
+                               s.Status = "Downloaded";
+                       }
 
                        if (s.Status == "Available")
                        {
