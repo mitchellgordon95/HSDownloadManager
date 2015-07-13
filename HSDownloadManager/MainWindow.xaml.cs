@@ -87,15 +87,7 @@ namespace HSDownloadManager
             Shows_LV.ItemsSource = ShowCollection;
 
             // When the user selects a show in the list, bring up an edit dialog.
-            Shows_LV.SelectionChanged += (sender, args) =>
-            {
-                if (args.AddedItems.Count > 0)
-                {
-                    EditShowWindow win = new EditShowWindow(args.AddedItems[0] as Show);
-                    win.Owner = this;
-                    win.Show();
-                }
-            };
+            Shows_LV.PreviewMouseLeftButtonUp += LV_Item_Clicked; 
 
             // Update the status of the shows if they've become available.
             foreach (Show s in ShowCollection ) {
@@ -453,7 +445,7 @@ namespace HSDownloadManager
             }
         }
 
-        #region button handlers
+        #region UI handlers
 
         /// <summary>
         /// Called when the "Download" button is clicked.
@@ -564,6 +556,22 @@ namespace HSDownloadManager
 
             StopCurrentDownload(CancelOrSkip.Skip);
         }
+
+        /// <summary>
+        /// Called when an item is clicked in the list view of shows. Opens an edit dialog.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        void LV_Item_Clicked(object sender, MouseButtonEventArgs args)
+        {
+            if (Shows_LV.SelectedIndex != -1)
+            {
+                EditShowWindow win = new EditShowWindow(ShowCollection.ElementAt(Shows_LV.SelectedIndex));
+                win.Owner = this;
+                win.Show();
+            }
+        }
+
 
         #endregion
 
