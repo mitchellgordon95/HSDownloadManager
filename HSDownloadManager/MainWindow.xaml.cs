@@ -79,6 +79,9 @@ namespace HSDownloadManager
                 // The file doesn't exist, so this is our first time running. That's fine.
             }
 
+            // Sort the shows by date
+            ShowCollection = new SerializableCollection<Show>(ShowCollection.OrderBy(show => show.AirsOn));
+
             // Connect the ListView to the list of shows we're tracking
             Shows_LV.Items.Clear();
             Shows_LV.ItemsSource = ShowCollection;
@@ -450,6 +453,8 @@ namespace HSDownloadManager
             }
         }
 
+        #region button handlers
+
         /// <summary>
         /// Called when the "Download" button is clicked.
         /// </summary>
@@ -559,6 +564,8 @@ namespace HSDownloadManager
 
             StopCurrentDownload(CancelOrSkip.Skip);
         }
+
+        #endregion
 
         enum CancelOrSkip
         {

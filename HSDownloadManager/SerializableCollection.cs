@@ -13,6 +13,12 @@ namespace HSDownloadManager
     [Serializable]
     public class SerializableCollection<T> : ObservableCollection<T>
     {
+        public SerializableCollection() { }
+
+        public SerializableCollection(IOrderedEnumerable<T> source) : base(source)
+        {
+        }
+
         public void LoadFromFile(string fileName)
         {
             if (!File.Exists(fileName))
