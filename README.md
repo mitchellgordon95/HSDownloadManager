@@ -11,7 +11,7 @@ This application is a download manager for the horrible subs group. You can find
 Horrible subs produces "fan-subbed" anime and makes it freely available to the public. They provide torrents as well as direct downloads over a protocol called XDCC, which is built on top of IRC and CTCP. This application tracks when the next episode of an anime becomes available, and automatically downloads it using the XDCC protocol.
 
 ##How to Use It
-Download the setup zip file from the [Latest Build](LatestBuild) folder and extract it. Then run setup.exe to install and run the application.
+Download the setup zip from the [latest release](https://github.com/mitchellgordon95/HSDownloadManager/releases/latest) and extract it. Then run setup.exe to install and run the application.
 
 Once the application is installed, go into the Settings menu and add an IRC username and select a folder to download to. The password field is currently unused.
 
