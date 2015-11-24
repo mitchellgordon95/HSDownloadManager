@@ -497,7 +497,7 @@ namespace HSDownloadManager
 
                     // Connect to the server.
                     string nick = settings.Nick;
-                    client.Connect(new Uri(settings.Server), new IrcUserRegistrationInfo() { NickName = nick, RealName = nick, UserName = nick, Password = settings.Pass });
+                    client.Connect(new Uri(settings.Server), new IrcUserRegistrationInfo() { NickName = nick, RealName = nick, UserName = nick });
                 });
             }
 
