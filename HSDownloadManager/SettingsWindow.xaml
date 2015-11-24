@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HSDownloadManager"
         xmlns:properties="clr-namespace:HSDownloadManager.Properties"
         mc:Ignorable="d"
-        Title="Settings" Height="300" Width="400">
+        Title="Settings" Height="400" Width="500">
     <Grid DataContext="{Binding Source={x:Static properties:Settings.Default}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -33,8 +33,8 @@
         <TextBox Name="ChannelTB" Grid.Column="1" Grid.Row="1" Text="{Binding Channel}"/>
         <TextBlock Grid.Column="0" Grid.Row="2">Nick</TextBlock>
         <TextBox Name="NickTB" Grid.Column="1" Grid.Row="2" Text="{Binding Nick}"/>
-        <TextBlock Grid.Column="0" Grid.Row="3">Pass</TextBlock>
-        <TextBox Name="PassTB" Grid.Column="1" Grid.Row="3" Text="{Binding Pass}"/>
+        <TextBlock Grid.Column="0" Grid.Row="3">NickServ Command (Omit /msg)</TextBlock>
+        <TextBox Name="NickServTB" Grid.Column="1" Grid.Row="3" Text="{Binding NickServ}"/>
         <TextBlock Grid.Column="0" Grid.Row="4">Resolution</TextBlock>
         <TextBox Name="ResolutionTB" Grid.Column="1" Grid.Row="4" Text="{Binding Resolution}"/>
         <TextBlock Grid.Column="0" Grid.Row="5">Preferred Bot</TextBlock>

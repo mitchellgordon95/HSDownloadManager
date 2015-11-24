@@ -33,7 +33,7 @@ namespace HSDownloadManager
                 set.Server = ServerTB.Text;
                 set.Channel = ChannelTB.Text;
                 set.Nick = NickTB.Text;
-                set.Pass = PassTB.Text;
+                set.NickServ = NickServTB.Text;
                 set.Resolution = ResolutionTB.Text;
                 set.PreferredBot = PreferredBotTB.Text;
                 set.DownloadsFolder = DownloadsFolderTB.Text;

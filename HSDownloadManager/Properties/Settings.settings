@@ -11,7 +11,7 @@
     <Setting Name="Nick" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Pass" Type="System.String" Scope="User">
+    <Setting Name="NickServ" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Resolution" Type="System.String" Scope="User">
